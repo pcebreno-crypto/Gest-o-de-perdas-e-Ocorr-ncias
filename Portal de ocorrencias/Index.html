@@ -1,0 +1,5170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Portal de Ocorrências</title>
+
+<link rel="icon" href="logo.png">
+
+<!-- XLSX -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<!-- ICONES -->
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+/>
+
+<style>
+
+/* =========================
+RESET
+========================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+/* =========================
+BODY
+========================= */
+
+body{
+
+    font-family:Arial,sans-serif;
+
+    background:#f3f5fb;
+
+    padding:20px;
+
+    color:#1e293b;
+
+}
+
+/* =========================
+CONTAINER
+========================= */
+
+.container{
+
+    max-width:1500px;
+
+    margin:auto;
+
+}
+
+.hidden{
+    display:none;
+}
+
+/* =========================
+LOGIN
+========================= */
+
+#loginArea{
+
+    max-width:420px;
+
+    margin:80px auto;
+
+    background:#fff;
+
+    padding:40px;
+
+    border-radius:24px;
+
+    box-shadow:
+    0 10px 40px rgba(0,0,0,0.08);
+
+    text-align:center;
+
+}
+
+.logo{
+
+    width:180px;
+
+    margin-bottom:20px;
+
+}
+
+/* =========================
+TOPO
+========================= */
+
+.topo{
+
+    background:
+    linear-gradient(
+    90deg,
+    #1d4ed8,
+    #4f46e5
+    );
+
+    border-radius:24px;
+
+    padding:35px;
+
+    color:#fff;
+
+    margin-bottom:30px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    flex-wrap:wrap;
+
+    gap:25px;
+
+    box-shadow:
+    0 12px 40px rgba(79,70,229,0.25);
+
+}
+
+.topo h1{
+
+    font-size:42px;
+
+    margin-bottom:10px;
+
+}
+
+.topo p{
+
+    opacity:0.9;
+
+    font-size:16px;
+
+}
+
+/* =========================
+TABS
+========================= */
+
+.tabs{
+
+    display:flex;
+
+    gap:12px;
+
+    flex-wrap:wrap;
+
+}
+
+.tab{
+
+    background:rgba(255,255,255,0.18);
+
+    backdrop-filter:blur(8px);
+
+    color:#fff;
+
+    padding:14px 20px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    transition:0.2s;
+
+    font-weight:bold;
+
+}
+
+.tab:hover{
+
+    background:rgba(255,255,255,0.25);
+
+}
+
+.tab.active{
+
+    background:#fff;
+
+    color:#1d4ed8;
+
+}
+
+/* =========================
+FILTROS
+========================= */
+
+.filtros-topo{
+
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:end;
+
+}
+
+.filtro-box{
+
+    min-width:140px;
+    flex:1;
+
+}
+
+.filtro-box select,
+.filtro-box input{
+
+    width:100%;
+    height:46px;
+    border:none;
+    border-radius:12px;
+    padding:0 10px;
+    font-size:13px;
+
+}
+
+.filtro-box label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#fff;
+
+}
+
+.filtro-box select,
+.filtro-box input{
+
+    width:100%;
+
+    height:52px;
+
+    border:none;
+
+    border-radius:14px;
+
+    padding:0 14px;
+
+    font-size:15px;
+
+}
+
+/* =========================
+BOTOES
+========================= */
+
+button:not(.btn-edit):not(.btn-delete){
+
+    border:none;
+
+    cursor:pointer;
+
+    border-radius:14px;
+
+    padding:14px 24px;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+    transition:0.2s;
+
+}
+
+.btn-edit:hover{
+
+    background:#2563eb;
+    color:#fff;
+
+}
+
+.btn-primary{
+
+    background:
+    linear-gradient(
+    90deg,
+    #2563eb,
+    #4f46e5
+    );
+
+    color:#fff;
+
+    box-shadow:
+    0 8px 20px rgba(37,99,235,0.3);
+
+}
+
+.btn-light{
+
+    background:#fff;
+
+    color:#334155;
+
+    box-shadow:
+    0 6px 18px rgba(0,0,0,0.06);
+
+}
+
+button.btn-edit,
+button.btn-delete{
+
+    padding:8px 12px !important;
+
+    font-size:12px !important;
+
+    border-radius:10px;
+
+    min-width:auto;
+
+    width:auto;
+
+}
+
+.btn-delete{
+
+    background:#fef2f2;
+    color:#dc2626;
+    border:1px solid #fecaca;
+
+}
+
+.btn-delete:hover{
+
+    background:#dc2626;
+    color:#fff;
+
+}
+
+.btn-edit{
+
+    background:#f8fafc;
+    color:#2563eb;
+    border:1px solid #dbeafe;
+
+}
+
+.btn-share{
+
+    background:#ecfeff;
+    color:#0891b2;
+    border:1px solid #a5f3fc;
+
+}
+
+.btn-share:hover{
+
+    background:#0891b2;
+    color:#fff;
+
+}
+
+.botoes-acao{
+
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+}
+
+/* =========================
+FORMULARIO
+========================= */
+
+.formulario{
+
+    background:#fff;
+
+    padding:35px;
+
+    border-radius:24px;
+
+    box-shadow:
+    0 10px 35px rgba(0,0,0,0.06);
+
+    margin-top:25px;
+
+}
+
+/* =========================
+GRID
+========================= */
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:20px;
+
+}
+
+.form-grid-2{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:20px;
+
+    margin-top:20px;
+
+}
+
+/* =========================
+INPUTS MODERNOS
+========================= */
+
+.input-group{
+
+    position:relative;
+
+    width:100%;
+
+}
+
+.input-group i{
+
+    position:absolute;
+
+    left:18px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:#4f46e5;
+
+    font-size:17px;
+
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea{
+
+    width:100%;
+
+    border:1px solid #dfe3f0;
+
+    border-radius:16px;
+
+    background:#fff;
+
+    padding-left:52px;
+
+    padding-right:15px;
+
+    font-size:15px;
+
+    color:#1e293b;
+
+    transition:0.2s;
+
+}
+
+.input-group input,
+.input-group select{
+
+    height:58px;
+
+}
+
+.input-group textarea{
+
+    height:130px;
+
+    padding-top:18px;
+
+    resize:none;
+
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus{
+
+    outline:none;
+
+    border-color:#4f46e5;
+
+    box-shadow:
+    0 0 0 4px rgba(79,70,229,0.12);
+
+}
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#475569;
+
+}
+
+/* =========================
+CARDS
+========================= */
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:18px;
+
+    margin:30px 0;
+
+}
+
+.card{
+
+    background:#fff;
+
+    border-radius:22px;
+
+    padding:26px;
+
+    box-shadow:
+    0 8px 30px rgba(0,0,0,0.06);
+
+}
+
+.card h3{
+
+    color:#64748b;
+
+    margin-bottom:12px;
+
+    font-size:15px;
+
+}
+
+.card p{
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    color:#1e293b;
+
+}
+
+/* =========================
+PESQUISA
+========================= */
+
+.pesquisa-area{
+
+    margin:30px 0;
+
+}
+
+.pesquisa-area input{
+
+    width:100%;
+
+    height:60px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:#fff;
+
+    padding:0 22px;
+
+    font-size:16px;
+
+    box-shadow:
+    0 6px 25px rgba(0,0,0,0.06);
+
+}
+
+/* =========================
+OCORRENCIAS
+========================= */
+
+.ocorrencia{
+
+    display:flex;
+
+    gap:25px;
+
+    background:#fff;
+
+    border-radius:24px;
+
+    padding:25px;
+
+    margin-top:25px;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,0.05);
+
+}
+
+.ocorrencia img{
+
+    width:300px;
+
+    border-radius:18px;
+
+    object-fit:cover;
+
+}
+
+.ocorrencia-info{
+
+    flex:1;
+
+}
+
+.ocorrencia-info h2{
+
+    margin-bottom:12px;
+
+    color:#1e293b;
+
+}
+
+.ocorrencia-info p{
+
+    margin-top:8px;
+
+    color:#475569;
+
+}
+
+
+/* =========================
+RESPONSIVO
+========================= */
+
+@media(max-width:900px){
+
+    .topo{
+
+        flex-direction:column;
+
+    }
+
+    .form-grid,
+    .form-grid-2{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .ocorrencia{
+
+        flex-direction:column;
+
+    }
+
+    .ocorrencia img{
+
+        width:100%;
+
+    }
+
+}
+
+/* =========================
+STATUS AVARIA
+========================= */
+
+.status-box{
+
+    margin-top:18px;
+
+}
+
+.status-select{
+
+    width:220px;
+
+    height:42px;
+
+    border-radius:12px;
+
+    border:1px solid #dbe2f0;
+
+    padding:0 12px;
+
+    font-weight:600;
+
+    background:#fff;
+
+    color:#1e293b;
+
+}
+
+.status-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    font-size:13px;
+
+    font-weight:bold;
+
+    margin-top:10px;
+
+}
+
+.status-pendente{
+
+    background:#fef3c7;
+    color:#92400e;
+
+}
+
+.status-andamento{
+
+    background:#dbeafe;
+    color:#1d4ed8;
+
+}
+
+.status-concluido{
+
+    background:#dcfce7;
+    color:#166534;
+
+}
+
+.dashboard-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(260px,1fr));
+
+    gap:20px;
+
+    margin-top:25px;
+}
+
+.grafico-box{
+
+    background: linear-gradient(
+        145deg,
+        #081120,
+        #0d1b2a
+    );
+
+    border:1px solid rgba(0,255,255,0.15);
+
+    border-radius:20px;
+
+    padding:20px;
+
+    margin-top:20px;
+
+    box-shadow:
+    0 0 30px rgba(0,255,255,0.08);
+
+}
+
+.grafico-box h2{
+
+    color:#ffffff;
+
+    margin-bottom:20px;
+
+    font-size:15px;
+
+}
+
+.dashboard-card{
+
+    background:
+    linear-gradient(
+        145deg,
+        #071a2f,
+        #0d2744
+    );
+
+    border:1px solid rgba(0,255,255,0.15);
+
+    border-radius:20px;
+
+    padding:25px;
+
+    box-shadow:
+    0 0 25px rgba(0,255,255,0.08);
+
+    transition:0.3s;
+
+    position:relative;
+
+    overflow:hidden;
+
+
+}
+
+.dashboard-card::before{
+
+    content:'';
+
+    position:absolute;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:3px;
+
+    background:
+    linear-gradient(
+        90deg,
+        #00F5FF,
+        #0066FF
+    );
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+    0 0 30px rgba(0,255,255,0.2);
+
+}
+
+.dashboard-card h3{
+
+    color:#8ECFFF;
+
+    font-size:18px;
+
+    margin-bottom:15px;
+
+    font-weight:600;
+
+}
+
+.dashboard-card p{
+
+    color:#ffffff;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    margin:0;
+
+}
+
+.ranking-box{
+
+    background: linear-gradient(
+        145deg,
+        #081120,
+        #0d1b2a
+    );
+
+    border-radius:20px;
+
+    padding:25px;
+
+    margin-top:25px;
+
+    border:1px solid rgba(0,255,255,0.15);
+
+    color:white;
+
+}
+
+.ranking-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:15px;
+
+    border-bottom:1px solid rgba(255,255,255,0.08);
+
+}
+
+.ranking-item strong{
+
+    color:#00F5FF;
+
+}
+
+#abaDashboard{
+
+    padding:20px;
+
+    background:
+    linear-gradient(
+        180deg,
+        #020b16,
+        #071b2f
+    );
+
+    border-radius:20px;
+
+}
+
+.dashboard-filtros{
+
+    display:flex;
+
+    gap:15px;
+
+    align-items:end;
+
+    margin-bottom:20px;
+
+    flex-wrap:wrap;
+
+}
+
+.dashboard-filtros .filtro-box{
+
+    min-width:160px;
+
+}
+
+.dashboard-filtros label{
+
+    display:block;
+
+    margin-bottom:6px;
+
+    color:#8ECFFF;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    letter-spacing:0.5px;
+
+}
+
+.dashboard-filtros input{
+
+    width:100%;
+
+    height:42px;
+
+    padding:0 14px;
+
+    border-radius:12px;
+
+    border:1px solid rgba(0,255,255,0.15);
+
+    background:rgba(5,20,35,0.9);
+
+    color:#ffffff;
+
+    outline:none;
+
+    font-size:13px;
+
+    transition:0.3s;
+
+    box-shadow:
+    inset 0 0 10px rgba(0,255,255,0.03);
+
+}
+
+.dashboard-filtros input:focus{
+
+    border-color:#00F5FF;
+
+    box-shadow:
+    0 0 15px rgba(0,245,255,0.25);
+
+}
+
+.dashboard-filtros input::-webkit-calendar-picker-indicator{
+
+    filter:invert(1);
+
+    opacity:0.7;
+
+    cursor:pointer;
+
+}
+
+.alertas-box{
+
+    margin-top:25px;
+
+}
+
+.alertas-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(280px,1fr));
+
+    gap:18px;
+
+    margin-top:20px;
+
+}
+
+.alerta-item{
+
+    min-height:110px;
+
+    padding:20px;
+
+    border-radius:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    line-height:1.5;
+
+    backdrop-filter:blur(10px);
+
+    transition:0.3s;
+
+    box-shadow:
+    0 0 18px rgba(0,0,0,0.25);
+
+}
+
+.alerta-item:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+    0 0 25px rgba(0,245,255,0.20);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+
+<div id="loginArea">
+
+    <img src="logo.png" class="logo">
+
+    <h2 style="margin-bottom:20px;">
+        Portal de Ocorrências
+    </h2>
+
+    <div class="input-group" style="margin-bottom:15px;">
+
+        <i class="fa-regular fa-user"></i>
+
+        <input
+            type="text"
+            id="usuario"
+            placeholder="Usuário"
+        >
+
+    </div>
+
+    <div class="input-group">
+
+        <i class="fa-solid fa-lock"></i>
+
+        <input
+            type="password"
+            id="senha"
+            placeholder="Senha"
+        >
+
+    </div>
+
+    <button
+        class="btn-primary"
+        onclick="login()"
+        style="width:100%;margin-top:20px;"
+    >
+        Entrar
+    </button>
+
+</div>
+
+<!-- SISTEMA -->
+
+<div id="appArea" style="display:none;">
+
+    <!-- TOPO -->
+
+    <div class="topo">
+
+        <div>
+
+            <h1>
+                Registro de Ocorrências
+            </h1>
+
+            <p>
+                Registre e acompanhe todas as ocorrências do estoque.
+            </p>
+
+            <div class="tabs" style="margin-top:25px;">
+
+                <div
+                    class="tab active"
+                    onclick="mostrarAba('ocorrencias')"
+                >
+                    Ocorrências
+                </div>
+
+                <div
+                    class="tab"
+                    onclick="mostrarAba('produtos')"
+                >
+                    Base Produtos
+                </div>
+
+                <div
+                    class="tab"
+                    onclick="mostrarAba('precos')"
+                    >
+                    Base Preços
+                </div>
+
+                <div
+                    class="tab"
+                    onclick="mostrarAba('dashboard')"
+                    >
+                    Dashboard
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FILTROS -->
+
+        <div class="filtros-topo">
+
+            <div class="filtro-box">
+
+                <label>Galpão</label>
+
+                <select
+                    id="filtroGalpao"
+                    onchange="aplicarFiltros()"
+                >
+
+                    <option value="">
+                        Todos
+                    </option>
+
+                    <option value="G1">
+                        G1
+                    </option>
+
+                    <option value="G2">
+                        G2
+                    </option>
+
+                    <option value="G4">
+                        G4
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="filtro-box">
+
+                <label>Ocorrência</label>
+
+                <select
+                    id="filtroTipo"
+                    onchange="
+                        controlarFiltroStatus();
+                        aplicarFiltros();
+                    "
+                >
+
+                    <option value="">
+                        Todas
+                    </option>
+
+                    <option value="CORTE INDEVIDO">
+                        Corte Indevido
+                    </option>
+
+                    <option value="AVARIA">
+                        Avaria
+                    </option>
+
+                    <option value="DESOVADO">
+                        Desovado
+                    </option>
+
+                </select>
+
+            </div>
+
+                <div
+                    class="filtro-box hidden"
+                    id="filtroStatusBox"
+                    >
+
+                    <label>Status</label>
+
+                    <select
+                        id="filtroStatus"
+                        onchange="aplicarFiltros()"
+                    >
+
+                        <option value="">
+                            Todos
+                        </option>
+
+                        <option value="PENDENTE">
+                            Pendente
+                        </option>
+
+                        <option value="EM ANDAMENTO">
+                            Em andamento
+                        </option>
+
+                        <option value="CONCLUIDO">
+                            Concluído
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div
+    class="filtro-box hidden"
+    id="filtroMotivoBox"
+>
+
+    <label>
+        Motivo da Avaria
+    </label>
+
+    <select
+        id="filtroMotivoAvaria"
+        onchange="aplicarFiltros()"
+    >
+
+        <option value="">
+            Todos
+        </option>
+
+        <option value="Avaria por descarga">
+            Avaria por descarga
+        </option>
+
+        <option value="Avaria por terceirizados">
+            Avaria por terceirizados
+        </option>
+
+        <option value="Avaria por Locomoção">
+            Avaria por Locomoção
+        </option>
+
+        <option value="Avaria pela produção">
+            Avaria pela produção
+        </option>
+
+    </select>
+
+</div>
+
+            <div class="filtro-box">
+
+                <label>Data Inicial</label>
+
+                <input
+                    type="date"
+                    id="dataInicio"
+                    onchange="aplicarFiltros()"
+                >
+
+            </div>
+
+            <div class="filtro-box">
+
+                <label>Data Final</label>
+
+                <input
+                    type="date"
+                    id="dataFim"
+                    onchange="aplicarFiltros()"
+                >
+
+            </div>
+
+            <div class="filtro-box">
+
+    <label>Local Encontrado</label>
+
+    <select
+        id="filtroTipoEncontrado"
+        onchange="aplicarFiltros()"
+    >
+
+        <option value="">
+            Todos
+        </option>
+
+        <option value="PULMAO">
+            Pulmão
+        </option>
+
+        <option value="APANHA">
+            Apanha
+        </option>
+
+    </select>
+
+</div>
+
+<div class="filtro-box">
+
+    <label>Local Origem</label>
+
+    <select
+        id="filtroTipoOrigem"
+        onchange="aplicarFiltros()"
+    >
+
+        <option value="">
+            Todos
+        </option>
+
+        <option value="PULMAO">
+            Pulmão
+        </option>
+
+        <option value="APANHA">
+            Apanha
+        </option>
+
+    </select>
+
+</div>
+
+<div class="filtro-box">
+
+    <label>Localização</label>
+
+    <select
+        id="filtroLocalizacao"
+        onchange="aplicarFiltros()"
+    >
+
+        <option value="">
+            Todos
+        </option>
+
+        <option value="DENTRO DA APANHA">
+            Dentro da apanha
+        </option>
+
+        <option value="FORA DA APANHA">
+            Fora da apanha
+        </option>
+
+    </select>
+
+</div>
+
+        </div>
+
+    </div>
+
+    <!-- EXPORTAR -->
+
+    <div style="display:flex;gap:15px;flex-wrap:wrap;">
+
+        <button
+            class="btn-primary"
+            onclick="exportarCSV()"
+        >
+            Exportar CSV
+        </button>
+
+        <button
+            class="btn-light"
+            onclick="exportarPDF()"
+        >
+            Exportar PDF
+        </button>
+
+    </div>
+
+    <!-- ABA PRODUTOS -->
+
+    <div
+        id="abaProdutos"
+        class="hidden formulario"
+    >
+
+        <h2>
+            Importar Base Produtos
+        </h2>
+
+        <br>
+
+        <input
+            type="file"
+            id="arquivoProdutos"
+            accept=".csv,.xlsx"
+        >
+
+    </div>
+
+    <!-- ABA PREÇOS -->
+
+    <div
+        id="abaPrecos"
+        class="hidden formulario"
+    >
+
+        <h2>
+            Importar Base Preços
+        </h2>
+
+        <br>
+
+        <input
+            type="file"
+            id="arquivoPrecos"
+            accept=".csv,.xlsx"
+        >
+
+    </div>
+
+    <!-- ABA DASHBOARD -->
+
+            <div
+                id="abaDashboard"
+                class="hidden"
+                >
+
+                            <div class="dashboard-filtros">
+
+                <div class="filtro-box">
+
+                    <label>De</label>
+
+                    <input
+                        type="date"
+                        id="dashDataInicio"
+                        onchange="atualizarDashboard()"
+                    >
+
+                </div>
+
+                <div class="filtro-box">
+
+                    <label>Até</label>
+
+                    <input
+                        type="date"
+                        id="dashDataFim"
+                        onchange="atualizarDashboard()"
+                    >
+
+                </div>
+
+            </div>
+
+                <div class="dashboard-grid">
+
+                    <div class="dashboard-card">
+                        <h3>Total Financeiro</h3>
+                        <p id="dashTotal">R$ 0,00</p>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>Total Ocorrências</h3>
+                        <p id="dashOcorrencias">0</p>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>Maior Galpão</h3>
+                        <p id="dashMaiorGalpao">-</p>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>Maior Motivo</h3>
+                        <p id="dashMaiorMotivo">-</p>
+                    </div>
+
+                    <div class="dashboard-card">
+
+                        <h3>
+                            Tendência Diária
+                        </h3>
+
+                        <p id="dashTendencia">
+                            -
+                        </p>
+
+                    </div>
+
+                    </div>
+
+                    <div class="alertas-box">
+
+                        <h2>
+                            Alertas Inteligentes
+                        </h2>
+
+                            <div
+                                id="listaAlertas"
+                                class="alertas-grid"
+                            ></div>
+
+                    </div>
+
+                    <div class="grafico-box">
+
+                    <h2>
+                        Prejuízo Diário Total
+                    </h2>
+
+                    <div style="height:400px;">
+                        <canvas id="graficoPerdasDiarias"></canvas>
+                    </div>
+
+                </div>
+
+                <div class="ranking-box">
+
+                    <h2>
+                        Ranking Maiores Perdas
+                    </h2>
+
+                    <div id="rankingPerdas"></div>
+
+                </div>
+
+            </div>
+
+
+    <!-- ABA OCORRENCIAS -->
+
+    <div id="abaOcorrencias">
+
+        <!-- FORM -->
+
+        <div class="formulario">
+
+            <div class="form-grid">
+
+                <!-- TIPO -->
+
+                <div>
+
+                    <label>
+                        Tipo da Ocorrência
+                    </label>
+
+                    <div class="input-group">
+
+                        <i class="fa-regular fa-clipboard"></i>
+
+                        <select
+                            id="tipo"
+                            onchange="
+                                toggleCampos();
+                                controlarMotivoAvaria();
+                            "
+                        >
+
+                            <option value="">
+                                Selecione o tipo
+                            </option>
+
+                            <option value="CORTE INDEVIDO">
+                                Corte Indevido
+                            </option>
+
+                            <option value="AVARIA">
+                                Avaria
+                            </option>
+
+                            <option value="DESOVADO">
+                                Desovado
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div
+id="boxMotivoAvaria"
+class="hidden"
+>
+
+    <label>
+        Motivo da Avaria
+    </label>
+
+    <select id="motivoAvaria">
+
+        <option value="">
+            Selecione o motivo
+        </option>
+
+        <option value="Avaria por descarga">
+            Avaria por descarga
+        </option>
+
+        <option value="Avaria por terceirizados">
+            Avaria por terceirizados
+        </option>
+
+        <option value="Avaria por Locomoção">
+            Avaria por Locomoção
+        </option>
+
+        <option value="Avaria pela produção">
+            Avaria pela produção
+        </option>
+
+    </select>
+
+</div>
+
+                <!-- GALPAO -->
+
+                <div>
+
+                    <label>
+                        Selecione o Galpão
+                    </label>
+
+                    <div class="input-group">
+
+                        <i class="fa-solid fa-warehouse"></i>
+
+                        <select id="galpao">
+
+                            <option value="">
+                                Selecione o galpão
+                            </option>
+
+                            <option value="G1">G1</option>
+                            <option value="G2">G2</option>
+                            <option value="G4">G4</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <!-- DATA -->
+
+                <div>
+
+                    <label>
+                        Data da Ocorrência
+                    </label>
+
+                    <div class="input-group">
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        <input
+                            type="date"
+                            id="data"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SKU -->
+
+            <div style="margin-top:20px;">
+
+                <label>
+                    SKU
+                </label>
+
+                <div class="input-group">
+
+                    <i class="fa-solid fa-tag"></i>
+
+                    <input
+                        type="text"
+                        id="sku"
+                        placeholder="Digite o código SKU"
+                        oninput="buscarProduto()"
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- PRODUTO -->
+
+            <div style="margin-top:20px;">
+
+                <label>
+                    Descrição do Produto
+                </label>
+
+                <div class="input-group">
+
+                    <i class="fa-solid fa-box"></i>
+
+                    <input
+                        type="text"
+                        id="descricaoProduto"
+                        placeholder="Descrição do produto"
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- PREÇO -->
+
+            <div class="form-grid-2">
+
+                <div>
+
+                    <label>
+                        Preço Unitário
+                    </label>
+
+                    <div class="input-group">
+
+                        <i class="fa-solid fa-dollar-sign"></i>
+
+                        <input
+                            type="text"
+                            id="precoProduto"
+                            placeholder="R$ 0,00"
+                        >
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <label id="labelQuantidade">
+                        Quantidade
+                    </label>
+
+                    <div class="input-group">
+
+                        <i class="fa-solid fa-hashtag"></i>
+
+                        <input
+                            type="number"
+                            id="quantidade"
+                            placeholder="0"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- CAMPOS CORTE INDEVIDO -->
+
+<div
+    id="camposCorte"
+    class="hidden"
+    style="margin-top:25px;"
+>
+
+    <div class="form-grid">
+
+        <!-- QUANTIDADE ENCONTRADA -->
+
+        <div>
+
+            <label>
+                Quantidade Encontrada
+            </label>
+
+            <div class="input-group">
+
+                <i class="fa-solid fa-boxes-stacked"></i>
+
+                <input
+                    type="number"
+                    id="quantidadeEncontrada"
+                    placeholder="0"
+                >
+
+            </div>
+
+        </div>
+
+        <!-- LOCALIZAÇÃO -->
+
+        <div>
+
+            <label>
+                Localização
+            </label>
+
+            <div class="input-group">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <select id="localizacaoCorte">
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="DENTRO DA APANHA">
+                        Dentro da apanha
+                    </option>
+
+                    <option value="FORA DA APANHA">
+                        Fora da apanha
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+            <!-- CAMPOS DESOVADO -->
+
+<div
+    id="camposDesovado"
+    class="hidden"
+    style="margin-top:25px;"
+>
+
+    <div class="form-grid">
+
+        <!-- GALPÃO ENCONTRADO -->
+
+        <div>
+
+            <label>
+                Galpão Encontrado
+            </label>
+
+            <div class="input-group">
+
+                <i class="fa-solid fa-warehouse"></i>
+
+                <select id="galpaoEncontrado">
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="G1">G1</option>
+                    <option value="G2">G2</option>
+                    <option value="G4">G4</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <!-- ENDEREÇO ENCONTRADO -->
+
+        <div>
+
+            <label>
+                Endereço Encontrado
+            </label>
+
+            <div class="input-group">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <input
+                    type="text"
+                    id="enderecoEncontrado"
+                    placeholder="Ex: A-01-02"
+                >
+
+            </div>
+
+        </div>
+
+        <!-- TIPO ENCONTRADO -->
+
+        <div>
+
+            <label>
+                Tipo Local Encontrado
+            </label>
+
+            <div class="input-group">
+
+                <i class="fa-solid fa-boxes-stacked"></i>
+
+                <select id="tipoEncontrado">
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="PULMAO">
+                        Pulmão
+                    </option>
+
+                    <option value="APANHA">
+                        Apanha
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div
+        class="form-grid"
+        style="margin-top:20px;"
+    >
+
+        <!-- GALPÃO ORIGEM -->
+
+        <div>
+
+            <label>
+                Galpão Origem
+            </label>
+
+            <div class="input-group">
+
+                <i class="fa-solid fa-warehouse"></i>
+
+                <select id="galpaoOrigem">
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="G1">G1</option>
+                    <option value="G2">G2</option>
+                    <option value="G4">G4</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <!-- ENDEREÇO ORIGEM -->
+
+        <div>
+
+            <label>
+                Endereço Origem
+            </label>
+
+            <div class="input-group">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <input
+                    type="text"
+                    id="enderecoOrigem"
+                    placeholder="Ex: B-02-04"
+                >
+
+            </div>
+
+        </div>
+
+        <!-- TIPO ORIGEM -->
+
+        <div>
+
+            <label>
+                Tipo Local Origem
+            </label>
+
+            <div class="input-group">
+
+                <i class="fa-solid fa-boxes-stacked"></i>
+
+                <select id="tipoOrigem">
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="PULMAO">
+                        Pulmão
+                    </option>
+
+                    <option value="APANHA">
+                        Apanha
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+               <!-- DESCRIÇÃO -->
+
+            <div style="margin-top:20px;">
+
+                <label>
+                    Descreva o ocorrido
+                </label>
+
+                <div class="input-group">
+
+                    <i class="fa-regular fa-comment"></i>
+
+                    <textarea
+                        id="descricao"
+                        placeholder="Detalhe o ocorrido..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+            <!-- FOTO -->
+
+            <div style="margin-top:20px;">
+
+                <label>
+                    Foto da ocorrência
+                </label>
+
+                <input
+                    type="file"
+                    id="imagem"
+                    accept="image/*"
+                >
+
+            </div>
+
+            <!-- BOTÃO -->
+
+            <div
+            style="
+            display:flex;
+            justify-content:flex-end;
+            margin-top:25px;
+            ">
+
+                <button
+                    class="btn-primary"
+                    onclick="salvarOcorrencia()"
+                >
+                    Salvar Ocorrência
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- CARDS -->
+
+        <div class="cards">
+
+            <div class="card">
+
+                <h3>
+                    Total Ocorrências
+                </h3>
+
+                <p id="cardOcorrencias">
+                    0
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <h3>
+                    Valor Total
+                </h3>
+
+                <p id="cardValor">
+                    R$ 0,00
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <h3>
+                    Total G1
+                </h3>
+
+                <p id="cardG1">
+                    R$ 0,00
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <h3>
+                    Total G2
+                </h3>
+
+                <p id="cardG2">
+                    R$ 0,00
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <h3>
+                    Total G4
+                </h3>
+
+                <p id="cardG4">
+                    R$ 0,00
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- PESQUISA -->
+
+        <div class="pesquisa-area">
+
+            <input
+                type="text"
+                id="pesquisaSKU"
+                placeholder="Pesquisar ocorrência pela SKU..."
+                onkeyup="pesquisarSKU()"
+            >
+
+        </div>
+
+        <!-- LISTA -->
+
+        <div id="listaOcorrencias"></div>
+
+    </div>
+
+</div>
+
+</div>
+   <<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+'https://caufgnqeysyejzoqldhf.supabase.co';
+
+const SUPABASE_KEY =
+'sb_publishable_zAiPcNmIldoQFi1eZIgjGg_11TZveI6';
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+console.log(supabaseClient);
+
+/* =========================
+VARIAVEIS
+========================= */
+
+let ocorrencias =
+JSON.parse(localStorage.getItem("ocorrencias")) || [];
+
+let produtos =
+JSON.parse(localStorage.getItem("produtos")) || {};
+
+let precos =
+JSON.parse(localStorage.getItem("precos")) || {};
+
+let editandoId = null;
+
+/* =========================
+LOGIN
+========================= */
+
+async function login() {
+
+    const usuario =
+    document.getElementById("usuario").value;
+
+    const senha =
+    document.getElementById("senha").value;
+
+    if(
+        usuario === "18161"
+        &&
+        senha === "15077"
+    ){
+
+        document
+        .getElementById("loginArea")
+        .style.display = "none";
+
+        document
+        .getElementById("appArea")
+        .style.display = "block";
+
+        /* =========================
+        CARREGAR SUPABASE
+        ========================= */
+
+        await carregarOcorrencias();
+
+        aplicarFiltros();
+
+        atualizarDashboard();
+
+    } else {
+
+        alert("Login inválido");
+
+    }
+
+}
+
+/* =========================
+ABAS
+========================= */
+
+function mostrarAba(aba){
+
+    if(aba === 'dashboard'){
+
+    document
+    .getElementById('abaDashboard')
+    .classList.remove('hidden');
+
+    setTimeout(() => {
+
+        atualizarDashboard();
+
+    }, 200);
+
+    }   
+
+    document
+    .getElementById("abaOcorrencias")
+    .classList.add("hidden");
+
+    document
+    .getElementById("abaProdutos")
+    .classList.add("hidden");
+
+    document
+    .getElementById("abaPrecos")
+    .classList.add("hidden");
+
+    document
+    .getElementById("abaDashboard")
+    .classList.add("hidden");
+
+    if(aba === 'ocorrencias'){
+
+        document
+        .getElementById("abaOcorrencias")
+        .classList.remove("hidden");
+
+    }
+
+    if(aba === 'produtos'){
+
+        document
+        .getElementById("abaProdutos")
+        .classList.remove("hidden");
+
+    }
+
+    if(aba === 'precos'){
+
+        document
+        .getElementById("abaPrecos")
+        .classList.remove("hidden");
+
+    }
+
+    if(aba === 'dashboard'){
+
+        document
+        .getElementById("abaDashboard")
+        .classList.remove("hidden");
+
+        atualizarDashboard();
+
+    }
+
+}
+
+    let chartPerdasDiarias = null;
+
+function atualizarDashboard(){
+
+    const dashInicio =
+    document.getElementById("dashDataInicio")?.value || '';
+
+    const dashFim =
+    document.getElementById("dashDataFim")?.value || '';
+
+    let total = 0;
+
+    let totalOcorrencias = 0;
+
+    const galpoes = {
+        G1:0,
+        G2:0,
+        G4:0
+    };
+
+    const motivos = {};
+
+    const perdasPorDia = {};
+
+    /* =========================
+    LOOP OCORRÊNCIAS
+    ========================= */
+
+    ocorrencias.forEach(o => {
+
+        if(
+            (dashInicio && o.data < dashInicio)
+            ||
+            (dashFim && o.data > dashFim)
+        ){
+            return;
+        }
+
+        totalOcorrencias++;
+
+        const valor =
+
+        Number(o.preco || 0)
+        *
+        Number(o.quantidade || 0);
+
+        total += valor;
+
+        /* =========================
+        GALPÕES
+        ========================= */
+
+        if(galpoes[o.galpao] !== undefined){
+
+            galpoes[o.galpao] += valor;
+
+        }
+
+        /* =========================
+        MOTIVOS
+        ========================= */
+
+        if(o.motivoAvaria){
+
+            if(!motivos[o.motivoAvaria]){
+
+                motivos[o.motivoAvaria] = 0;
+
+            }
+
+            motivos[o.motivoAvaria] += valor;
+
+        }
+
+        /* =========================
+        PREJUÍZO POR DIA
+        ========================= */
+
+        const data =
+        o.data || 'Sem data';
+
+        if(!perdasPorDia[data]){
+
+            perdasPorDia[data] = 0;
+
+        }
+
+        perdasPorDia[data] += valor;
+
+    });
+
+    /* =========================
+    KPI TOTAL
+    ========================= */
+
+    document.getElementById("dashTotal").innerText =
+
+    total.toLocaleString(
+        'pt-BR',
+        {
+            style:'currency',
+            currency:'BRL'
+        }
+    );
+
+    /* =========================
+    TOTAL OCORRÊNCIAS
+    ========================= */
+
+    document.getElementById(
+        "dashOcorrencias"
+    ).innerText = totalOcorrencias;
+
+    /* =========================
+    MAIOR GALPÃO
+    ========================= */
+
+    const maiorGalpao =
+
+    Object.entries(galpoes)
+    .sort((a,b)=>b[1]-a[1])[0];
+
+    document.getElementById(
+        "dashMaiorGalpao"
+    ).innerText =
+
+    maiorGalpao
+
+    ?
+
+    `${maiorGalpao[0]} - ${
+        maiorGalpao[1].toLocaleString(
+            'pt-BR',
+            {
+                style:'currency',
+                currency:'BRL'
+            }
+        )
+    }`
+
+    : '-';
+
+    /* =========================
+    MAIOR MOTIVO
+    ========================= */
+
+    const maiorMotivo =
+
+    Object.entries(motivos)
+    .sort((a,b)=>b[1]-a[1])[0];
+
+    document.getElementById(
+        "dashMaiorMotivo"
+    ).innerText =
+
+    maiorMotivo
+    ? maiorMotivo[0]
+    : '-';
+
+    /* =========================
+    DATAS ORDENADAS
+    ========================= */
+
+    const datasOrdenadas =
+
+    Object.keys(perdasPorDia)
+    .sort((a,b)=>{
+
+        return new Date(a) - new Date(b);
+
+    });
+
+    const valoresOrdenados =
+
+    datasOrdenadas.map(data => {
+
+        return perdasPorDia[data];
+
+    });
+
+    /* =========================
+    TENDÊNCIA DIÁRIA
+    ========================= */
+
+    const tendenciaBox =
+    document.getElementById(
+        "dashTendencia"
+    );
+
+    if(
+        tendenciaBox &&
+        valoresOrdenados.length >= 2
+    ){
+
+        const ultimoValor =
+
+        valoresOrdenados[
+            valoresOrdenados.length - 1
+        ];
+
+        const penultimoValor =
+
+        valoresOrdenados[
+            valoresOrdenados.length - 2
+        ];
+
+        let percentual = 0;
+
+        if(penultimoValor > 0){
+
+            percentual =
+
+            (
+                (
+                    ultimoValor -
+                    penultimoValor
+                )
+
+                /
+
+                penultimoValor
+
+            ) * 100;
+
+        }
+
+        const aumento =
+        percentual > 0;
+
+        tendenciaBox.innerHTML =
+
+        `
+        <span style="
+            color:${aumento ? '#ff4d6d' : '#00e676'};
+            font-weight:700;
+            font-size:26px;
+            text-shadow:0 0 12px ${
+                aumento
+                ? '#ff4d6d'
+                : '#00e676'
+            };
+        ">
+
+            ${aumento ? '↑' : '↓'}
+
+            ${Math.abs(percentual).toFixed(1)}%
+
+        </span>
+        `;
+
+    }
+
+    /* =========================
+    GRÁFICO PREJUÍZO DIÁRIO
+    ========================= */
+
+    const canvas =
+    document.getElementById(
+        "graficoPerdasDiarias"
+    );
+
+    if(canvas){
+
+        const ctx =
+        canvas.getContext("2d");
+
+        /* =========================
+        DESTRUIR GRÁFICO ANTIGO
+        ========================= */
+
+        if(chartPerdasDiarias){
+
+            chartPerdasDiarias.destroy();
+
+        }
+
+        /* =========================
+        DATAS FORMATADAS
+        ========================= */
+
+        const datasFormatadas =
+
+        datasOrdenadas.map(data => {
+
+            const partes = data.split('-');
+
+            if(partes.length !== 3)
+                return data;
+
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+        });
+
+        /* =========================
+        GRADIENTE
+        ========================= */
+
+        const gradient = ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            400
+        );
+
+        gradient.addColorStop(
+            0,
+            'rgba(0,255,255,0.8)'
+        );
+
+        gradient.addColorStop(
+            0.5,
+            'rgba(0,140,255,0.35)'
+        );
+
+        gradient.addColorStop(
+            1,
+            'rgba(0,0,0,0)'
+        );
+
+        /* =========================
+        NOVO CHART
+        ========================= */
+
+        chartPerdasDiarias = new Chart(ctx,{
+
+            plugins:[ChartDataLabels],
+
+            type:'line',
+
+            data:{
+
+                labels: datasFormatadas,
+
+                datasets:[{
+
+                    label:'Prejuízo Diário',
+
+                    data: valoresOrdenados,
+
+                    borderWidth:3,
+
+                    borderColor:'#00F5FF',
+
+                    backgroundColor:gradient,
+
+                    fill:true,
+
+                    tension:0.35,
+
+                    pointRadius:5,
+
+                    pointHoverRadius:7,
+
+                    pointBackgroundColor:'#00F5FF',
+
+                    pointBorderColor:'#ffffff',
+
+                    pointBorderWidth:2
+
+                }]
+
+            },
+
+            options:{
+
+                responsive:true,
+
+                maintainAspectRatio:false,
+
+                interaction:{
+                    intersect:false,
+                    mode:'index'
+                },
+
+                plugins:{
+
+    legend:{
+        display:false
+    },
+
+    datalabels:{
+
+        textStrokeColor:'rgba(0,0,0,0.85)',
+
+        textStrokeWidth:3,
+
+        anchor:'end',
+
+        align:'top',
+
+        offset:10,
+
+        backgroundColor:function(context){
+
+            const index = context.dataIndex;
+
+            if(index === 0){
+
+                return 'rgba(255,255,255,0.12)';
+
+            }
+
+            const atual =
+            context.dataset.data[index];
+
+            const anterior =
+            context.dataset.data[index - 1];
+
+            /* AUMENTOU = VERMELHO */
+
+            return atual >= anterior
+
+            ? 'rgba(255,77,109,0.22)'
+
+            /* DIMINUIU = VERDE */
+
+            : 'rgba(0,255,136,0.20)';
+
+        },
+
+        borderColor:function(context){
+
+            const index = context.dataIndex;
+
+            if(index === 0){
+
+                return '#00F5FF';
+
+            }
+
+            const atual =
+            context.dataset.data[index];
+
+            const anterior =
+            context.dataset.data[index - 1];
+
+            /* AUMENTOU = VERMELHO */
+
+            return atual >= anterior
+
+            ? '#ff4d6d'
+
+            /* DIMINUIU = VERDE */
+
+            : '#00ff88';
+
+        },
+
+        borderWidth:1,
+
+        borderRadius:12,
+
+        padding:{
+            top:7,
+            bottom:7,
+            left:10,
+            right:10
+        },
+
+        color:function(context){
+
+                const index = context.dataIndex;
+
+                if(index === 0){
+
+                    return '#ffffff';
+
+                }
+
+                const atual =
+                context.dataset.data[index];
+
+                const anterior =
+                context.dataset.data[index - 1];
+
+                /* AUMENTOU = VERMELHO */
+
+                return atual >= anterior
+
+                ? '#ff4d6d'
+
+                /* DIMINUIU = VERDE */
+
+                : '#00ff88';
+
+            },
+
+        font:{
+            weight:'bold',
+            size:11
+        },
+
+        formatter:function(value, context){
+
+            const index =
+            context.dataIndex;
+
+            const valorFormatado =
+            value.toLocaleString(
+                'pt-BR',
+                {
+                    style:'currency',
+                    currency:'BRL'
+                }
+            );
+
+            /* PRIMEIRO DIA */
+
+            if(index === 0){
+
+                return [
+                    valorFormatado,
+                    'Base inicial'
+                ];
+
+            }
+
+            const valorAnterior =
+
+            context.chart
+            .data
+            .datasets[0]
+            .data[index - 1];
+
+            if(valorAnterior <= 0){
+
+                return [
+                    valorFormatado
+                ];
+
+            }
+
+            const diferenca =
+
+            (
+                (
+                    value - valorAnterior
+                )
+                /
+                valorAnterior
+            ) * 100;
+
+            const aumento =
+            diferenca >= 0;
+
+            const tendencia =
+
+            `${aumento ? '↑' : '↓'} `
+            +
+            `${Math.abs(diferenca).toFixed(1)}%`;
+
+            return [
+
+                valorFormatado,
+
+                tendencia
+
+            ];
+
+        }
+
+    },
+
+    tooltip:{
+
+        backgroundColor:'#071b2f',
+
+        borderColor:'#00F5FF',
+
+        borderWidth:1,
+
+        titleColor:'#fff',
+
+        bodyColor:'#fff',
+
+        displayColors:false,
+
+        callbacks:{
+
+            label:function(context){
+
+                const index =
+                context.dataIndex;
+
+                const atual =
+                context.raw;
+
+                const valorFormatado =
+
+                atual.toLocaleString(
+                    'pt-BR',
+                    {
+                        style:'currency',
+                        currency:'BRL'
+                    }
+                );
+
+                if(index === 0){
+
+                    return valorFormatado;
+
+                }
+
+                const anterior =
+
+                context.dataset
+                .data[index - 1];
+
+                if(anterior <= 0){
+
+                    return valorFormatado;
+
+                }
+
+                const diferenca =
+
+                (
+                    (
+                        atual - anterior
+                    )
+                    /
+                    anterior
+                ) * 100;
+
+                const aumento =
+                diferenca >= 0;
+
+                return `
+
+${valorFormatado}
+${aumento ? '↑ Aumento' : '↓ Queda'} de ${Math.abs(diferenca).toFixed(1)}%
+
+                `;
+
+            }
+
+        }
+
+    }
+
+},
+
+scales:{
+
+    x:{
+
+        ticks:{
+
+            color:'#8ECFFF',
+
+            font:{
+                size:12,
+                weight:'600'
+            }
+
+        },
+
+        grid:{
+            display:false
+        }
+
+    },
+
+    y:{
+
+        display:false,
+
+        grid:{
+            display:false
+        }
+
+    }
+
+}
+
+                                }
+
+                            });
+
+    }
+
+    /* =========================
+ALERTAS INTELIGENTES
+========================= */
+
+const listaAlertas =
+document.getElementById(
+    "listaAlertas"
+);
+
+if(listaAlertas){
+
+    listaAlertas.innerHTML = '';
+
+    /* =========================
+    ALERTA TENDÊNCIA DIÁRIA
+    ========================= */
+
+    if(valoresOrdenados.length >= 2){
+
+        const ultimo =
+
+        valoresOrdenados[
+            valoresOrdenados.length - 1
+        ];
+
+        const anterior =
+
+        valoresOrdenados[
+            valoresOrdenados.length - 2
+        ];
+
+        if(anterior > 0){
+
+            const variacao =
+
+            (
+                (
+                    ultimo - anterior
+                )
+                /
+                anterior
+            ) * 100;
+
+            if(variacao > 20){
+
+                listaAlertas.innerHTML += `
+
+                    <div class="alerta-item">
+
+                        🚨 Prejuízo diário aumentou
+                        ${variacao.toFixed(1)}%
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+    }
+
+/* =========================
+SKU REINCIDENTE
+========================= */
+
+const skuContagem = {};
+
+ocorrencias.forEach(o => {
+
+    if(!o.sku) return;
+
+    if(!skuContagem[o.sku]){
+
+        skuContagem[o.sku] = 0;
+
+    }
+
+    skuContagem[o.sku]++;
+
+});
+
+const maiorSKU =
+
+Object.entries(skuContagem)
+.sort((a,b)=>b[1]-a[1])[0];
+
+listaAlertas.innerHTML += `
+
+<div class="alerta-item alerta-warning">
+
+    🔁 SKU Reincidente<br><br>
+
+    ${
+        maiorSKU
+        ? `${maiorSKU[0]} (${maiorSKU[1]}x)`
+        : 'Sem recorrência'
+    }
+
+</div>
+
+`;
+
+/* =========================
+AVARIA FORA DO PADRÃO
+========================= */
+
+const totalMotivos =
+
+Object.values(motivos)
+.reduce((a,b)=>a+b,0);
+
+const maiorMotivoAlerta =
+
+Object.entries(motivos)
+.sort((a,b)=>b[1]-a[1])[0];
+
+listaAlertas.innerHTML += `
+
+<div class="alerta-item alerta-danger">
+
+    🚨 Maior Avaria<br><br>
+
+    ${
+        maiorMotivoAlerta
+        ? maiorMotivoAlerta[0]
+        : 'Sem dados'
+    }
+
+</div>
+
+`;
+
+/* =========================
+TENDÊNCIA SEMANAL
+========================= */
+
+let tendenciaTexto =
+'Sem dados suficientes';
+
+let tendenciaClasse =
+'alerta-warning';
+
+if(valoresOrdenados.length >= 7){
+
+    const ultimos7 =
+
+    valoresOrdenados.slice(-7);
+
+    const primeiros3 =
+
+    ultimos7.slice(0,3)
+    .reduce((a,b)=>a+b,0);
+
+    const ultimos3 =
+
+    ultimos7.slice(-3)
+    .reduce((a,b)=>a+b,0);
+
+    const tendenciaAlta =
+    ultimos3 > primeiros3;
+
+    tendenciaTexto =
+
+    tendenciaAlta
+    ? '📈 Tendência de ALTA'
+    : '📉 Tendência de QUEDA';
+
+    tendenciaClasse =
+
+    tendenciaAlta
+    ? 'alerta-danger'
+    : 'alerta-success';
+
+}
+
+listaAlertas.innerHTML += `
+
+<div class="alerta-item ${tendenciaClasse}">
+
+    ${tendenciaTexto}
+
+</div>
+
+`;
+
+    /* =========================
+    ALERTA GALPÃO CRÍTICO
+    ========================= */
+
+    const totalGalpoes =
+
+    Object.values(galpoes)
+    .reduce((a,b)=>a+b,0);
+
+    Object.entries(galpoes)
+    .forEach(([galpao,valor])=>{
+
+        const percentual =
+
+        (
+            valor / totalGalpoes
+        ) * 100;
+
+        if(percentual >= 50){
+
+            listaAlertas.innerHTML += `
+
+                <div class="alerta-item">
+
+                    ⚠ ${galpao}
+                    concentra
+                    ${percentual.toFixed(1)}%
+                    das perdas.
+
+                </div>
+
+            `;
+
+        }
+
+    });
+
+}
+
+    /* =========================
+    RANKING MAIORES PERDAS
+    ========================= */
+
+    const ranking =
+
+    [...ocorrencias]
+
+    .filter(o => {
+
+        return !(
+            (dashInicio && o.data < dashInicio)
+            ||
+            (dashFim && o.data > dashFim)
+        );
+
+    })
+
+    .sort((a,b)=>{
+
+        const totalA =
+
+        Number(a.preco || 0)
+        *
+        Number(a.quantidade || 0);
+
+        const totalB =
+
+        Number(b.preco || 0)
+        *
+        Number(b.quantidade || 0);
+
+        return totalB - totalA;
+
+    })
+
+    .slice(0,10);
+
+    const box =
+
+    document.getElementById(
+        "rankingPerdas"
+    );
+
+    if(box){
+
+        box.innerHTML = '';
+
+        ranking.forEach(o => {
+
+            const totalItem =
+
+            Number(o.preco || 0)
+            *
+            Number(o.quantidade || 0);
+
+            box.innerHTML += `
+
+                <div class="ranking-item">
+
+                    <div>
+
+                        <strong>${o.sku}</strong>
+
+                        <br>
+
+                        ${o.descricaoProduto}
+
+                    </div>
+
+                    <div>
+
+                        ${totalItem.toLocaleString(
+                            'pt-BR',
+                            {
+                                style:'currency',
+                                currency:'BRL'
+                            }
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+    }
+
+}
+
+    function buscarProduto(){
+
+    let sku =
+    document
+    .getElementById("sku")
+    .value;
+
+    sku =
+    String(sku)
+    .trim()
+    .replace(/\s/g,'');
+
+    console.log("SKU:", sku);
+
+    /* =========================
+    DESCRIÇÃO
+    ========================= */
+
+    document
+    .getElementById("descricaoProduto")
+    .value =
+    produtos[sku] || '';
+
+    /* =========================
+    PREÇO
+    ========================= */
+
+    let preco = precos[sku];
+
+    console.log("PREÇO:", preco);
+
+    if(
+    preco !== undefined &&
+    preco !== null
+    ){
+
+    preco = parseFloat(preco);
+
+    document
+    .getElementById("precoProduto")
+    .value =
+
+    preco.toLocaleString(
+        'pt-BR',
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+    );
+
+    }else{
+
+    document
+    .getElementById("precoProduto")
+    .value = '';
+
+    }
+
+    }
+
+/* =========================
+IMPORTAR BASES
+========================= */
+
+function importarArquivo(file, tipo){
+
+    if(!file){
+
+        alert("Selecione um arquivo.");
+        return;
+
+        }
+
+        const reader = new FileReader();
+
+            reader.onload = function(e){
+
+            const data =
+            new Uint8Array(e.target.result);
+
+            const workbook =
+            XLSX.read(data,{
+                type:'array'
+            });
+
+            const sheet =
+            workbook.Sheets[
+                workbook.SheetNames[0]
+            ];
+
+        /*
+        JSON
+        */
+
+        const linhas =
+        XLSX.utils.sheet_to_json(
+            sheet,
+            {
+                header:1,
+                defval:''
+            }
+        );
+
+        if(tipo === 'produto'){
+            produtos = {};
+        }
+
+        if(tipo === 'preco'){
+            precos = {};
+        }
+
+        linhas.forEach((linha,index)=>{
+
+            /*
+            pula cabeçalho
+            */
+
+            if(index === 0) return;
+
+            /*
+            SKU
+            */
+
+            let codigo =
+            String(linha[0] || '')
+            .trim();
+
+            codigo =
+            codigo.replace(/\s/g,'');
+
+            if(!codigo) return;
+
+            /*
+            PRODUTO
+            */
+
+            if(tipo === 'produto'){
+
+                produtos[codigo] =
+                String(linha[1] || '')
+                .trim();
+
+            }
+
+            /*
+            PREÇO
+            */
+
+            if(tipo === 'preco'){
+
+    let valor = linha[1];
+
+    console.log(
+        'SKU:',
+        codigo,
+        'VALOR ORIGINAL:',
+        valor,
+        typeof valor
+    );
+
+    /*
+    SE O EXCEL JÁ TROUXE NÚMERO
+    */
+
+    if(typeof valor === 'number'){
+
+        precos[codigo] = valor;
+
+    }
+
+    /*
+    SE VEIO TEXTO
+    */
+
+    else{
+
+    valor =
+    String(valor)
+    .trim()
+    .replace('R$','')
+    .replace(/\s/g,'');
+
+    /*
+    Se tiver milhar:
+    2.458,00
+    */
+
+    if(
+        valor.includes('.') &&
+        valor.includes(',')
+    ){
+
+        valor =
+        valor
+        .replace(',','.');
+
+    }
+
+    /*
+    Se for:
+    478,00
+    */
+
+    else if(valor.includes(',')){
+
+        valor =
+        valor.replace(',','.');
+
+    }
+
+    precos[codigo] =
+    parseFloat(valor) || 0;
+
+}
+
+    console.log(
+        'PREÇO FINAL:',
+        precos[codigo]
+    );
+
+    }
+
+        });
+
+        /*
+        SALVA
+        */
+
+        localStorage.setItem(
+            "produtos",
+            JSON.stringify(produtos)
+        );
+
+        /*
+        IMPORTANTE:
+        REMOVE STORAGE ANTIGO
+        */
+
+        localStorage.removeItem("precos");
+
+        localStorage.setItem(
+            "precos",
+            JSON.stringify(precos)
+        );
+
+        alert(
+            tipo === 'produto'
+            ? 'Base produtos carregada!'
+            : 'Base preços carregada!'
+        );
+
+    };
+
+    reader.readAsArrayBuffer(file);
+
+}
+
+function normalizarSKU(valor){
+
+    return String(valor || '')
+    .trim()
+    .replace(/\s/g,'')
+    .replace('.0','');
+
+}
+/* =========================
+EVENTOS IMPORTAÇÃO
+========================= */
+
+document
+.getElementById("arquivoProdutos")
+.addEventListener("change",function(e){
+
+    importarArquivo(
+        e.target.files[0],
+        'produto'
+    );
+
+});
+
+document
+.getElementById("arquivoPrecos")
+.addEventListener("change",function(e){
+
+    importarArquivo(
+        e.target.files[0],
+        'preco'
+    );
+
+});
+
+
+function toggleCampos(){
+
+    const tipo =
+    document.getElementById("tipo").value;
+
+    const areaDesovado =
+    document.getElementById("camposDesovado");
+
+    const areaCorte =
+    document.getElementById("camposCorte");
+
+    const labelQuantidade =
+    document.getElementById("labelQuantidade");
+
+    /* =========================
+    DESOVADO
+    ========================= */
+
+    if(tipo === "DESOVADO"){
+
+        areaDesovado.classList.remove("hidden");
+
+    }else{
+
+        areaDesovado.classList.add("hidden");
+
+    }
+
+    /* =========================
+    CORTE INDEVIDO
+    ========================= */
+
+    if(tipo === "CORTE INDEVIDO"){
+
+        areaCorte.classList.remove("hidden");
+
+        labelQuantidade.innerText =
+        "Quantidade Cortada";
+
+    }else{
+
+        areaCorte.classList.add("hidden");
+
+        labelQuantidade.innerText =
+        "Quantidade";
+
+    }
+
+}
+
+async function testarSupabase(){
+
+    const { data, error } = await supabaseClient
+    .from('ocorrencias')
+    .select('*');
+
+    console.log("DADOS:", data);
+    console.log("ERRO:", error);
+
+}
+/* =========================
+SALVAR OCORRÊNCIA
+========================= */
+
+async function salvarOcorrencia() {
+
+    const imagem =
+    document
+    .getElementById("imagem")
+    .files[0];
+
+    /* =========================
+    UPLOAD IMAGEM SUPABASE
+    ========================= */
+
+    async function uploadImagem(file){
+
+        const nomeArquivo =
+        Date.now() + "_" + file.name;
+
+        const { data, error } =
+
+        await supabaseClient.storage
+
+        .from('ocorrencias')
+
+        .upload(nomeArquivo, file);
+
+        if(error){
+
+            console.error(
+                "Erro upload imagem:",
+                error
+            );
+
+            return null;
+
+        }
+
+        const { data: urlData } =
+
+        supabaseClient.storage
+
+        .from('ocorrencias')
+
+        .getPublicUrl(nomeArquivo);
+
+        return urlData.publicUrl;
+
+    }
+
+    /* =========================
+    PREÇO
+    ========================= */
+
+    const precoTexto =
+    document
+    .getElementById("precoProduto")
+    .value
+    .trim();
+
+    let precoLimpo =
+
+        precoTexto
+        .replace('R$','')
+        .replace(/\s/g,'')
+        .trim();
+
+    const preco =
+
+    parseFloat(
+
+        precoLimpo
+        .replace(/\./g,'')
+        .replace(',','.')
+
+    ) || 0;
+
+    /* =========================
+    IMAGEM URL
+    ========================= */
+
+    let imagemUrl = '';
+
+    if(imagem){
+
+        imagemUrl =
+        await uploadImagem(imagem);
+
+    }
+
+    /* =========================
+    OBJETO
+    ========================= */
+
+    const obj = {
+
+        id:
+        editandoId
+        ? editandoId
+        : crypto.randomUUID(),
+
+        motivoAvaria:
+        document.getElementById("motivoAvaria")?.value || '',
+
+        status:
+        (
+            ocorrencias.find(
+                item => item.id === editandoId
+            )?.status
+        ) || 'PENDENTE',
+
+        tipo:
+        document.getElementById("tipo").value,
+
+        galpao:
+        document.getElementById("galpao").value,
+
+        data:
+        document.getElementById("data").value,
+
+        sku:
+        document.getElementById("sku").value,
+
+        descricaoProduto:
+        document.getElementById("descricaoProduto").value,
+
+        preco:
+        preco,
+
+        quantidade:
+        Number(
+            document.getElementById("quantidade").value
+        ) || 0,
+
+        descricao:
+        document.getElementById("descricao").value,
+
+        imagem:
+        imagemUrl,
+
+        galpaoEncontrado:
+        document.getElementById("galpaoEncontrado")?.value || '',
+
+        enderecoEncontrado:
+        document.getElementById("enderecoEncontrado")?.value || '',
+
+        tipoEncontrado:
+        document.getElementById("tipoEncontrado")?.value || '',
+
+        galpaoOrigem:
+        document.getElementById("galpaoOrigem")?.value || '',
+
+        enderecoOrigem:
+        document.getElementById("enderecoOrigem")?.value || '',
+
+        tipoOrigem:
+        document.getElementById("tipoOrigem")?.value || '',
+
+        quantidadeEncontrada:
+        Number(
+            document.getElementById("quantidadeEncontrada")?.value
+        ) || 0,
+
+        localizacaoCorte:
+        document.getElementById("localizacaoCorte")?.value || ''
+
+    };
+
+    /* =========================
+    VALIDAÇÃO
+    ========================= */
+
+    if(
+        !obj.tipo ||
+        !obj.galpao ||
+        !obj.data ||
+        !obj.sku
+    ){
+
+        alert(
+            "Preencha todos os campos obrigatórios."
+        );
+
+        return;
+
+    }
+
+    /* =========================
+    EDITAR
+    ========================= */
+
+    if(editandoId){
+
+        ocorrencias = ocorrencias.map(item => {
+
+            if(item.id === editandoId){
+
+                if(!imagemUrl){
+
+                    obj.imagem = item.imagem;
+
+                }
+
+                return obj;
+
+            }
+
+            return item;
+
+        });
+
+    } else {
+
+        ocorrencias.unshift(obj);
+
+    }
+
+    /* =========================
+    SALVAR NO SUPABASE
+    ========================= */
+
+    const { data, error } = await supabaseClient
+.from('ocorrencias')
+.insert([
+{
+    tipo: obj.tipo,
+
+    motivo: obj.motivo,
+
+    Status: obj.status,
+
+    Galpao: obj.galpao,
+
+    SKU: obj.sku,
+
+    descricao_produto: obj.descricaoProduto,
+
+    preco: obj.preco,
+
+    quantidade: obj.quantidade,
+
+    descrição: obj.descricao,
+
+    imagem: obj.imagem,
+
+    motivo_avaria: obj.motivoAvaria,
+
+    Título: obj.titulo,
+
+    galpao_encontrado: obj.galpaoEncontrado,
+
+    endereco_encontrado: obj.enderecoEncontrado,
+
+    tipo_encontrado: obj.tipoEncontrado,
+
+    galpao_origem: obj.galpaoOrigem,
+
+    endereco_origem: obj.enderecoOrigem,
+
+    tipo_origem: obj.tipoOrigem,
+
+    quantidade_encontrada: obj.quantidadeEncontrada,
+
+    localizacao_corte: obj.localizacaoCorte
+}
+]);
+
+    if(error){
+
+        console.error(
+            "Erro Supabase:",
+            error
+        );
+
+        alert(
+            "Erro ao salvar no banco."
+        );
+
+        return;
+
+    }
+
+    /* =========================
+    FINALIZAR
+    ========================= */
+
+    editandoId = null;
+
+    limparFormulario();
+
+    aplicarFiltros();
+
+    atualizarDashboard();
+
+    alert(
+        "Ocorrência salva com sucesso!"
+    );
+
+}
+
+async function carregarOcorrencias(){
+
+    const { data, error } =
+
+    await supabaseClient
+
+    .from('ocorrencias')
+
+    .select('*')
+
+   .order('id', { ascending: false })
+
+    ocorrencias = data || [];
+
+    render();
+
+    atualizarDashboard();
+
+}
+
+/* =========================
+RENDER
+========================= */
+
+function render(lista){
+
+    if(!lista){
+
+        lista = ocorrencias;
+
+    }
+
+    const area =
+    document.getElementById("listaOcorrencias");
+
+    area.innerHTML = '';
+
+    lista.forEach((o)=>{
+
+        const total =
+        Number(o.preco || 0)
+        *
+        Number(o.quantidade || 0);
+
+        const div =
+        document.createElement("div");
+
+        div.className =
+        "ocorrencia";
+
+        div.innerHTML = `
+
+            ${o.imagem
+            ? `<img src="${o.imagem}">`
+            : ''}
+
+            <div class="ocorrencia-info">
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:15px;
+        flex-wrap:wrap;
+    ">
+
+        <h2>${o.tipo}</h2>
+
+        ${
+            o.tipo === "AVARIA"
+            ?
+            `
+                <span class="
+                    status-badge
+                    ${
+                        o.status === 'PENDENTE'
+                        ? 'status-pendente'
+                        :
+                        o.status === 'EM ANDAMENTO'
+                        ? 'status-andamento'
+                        : 'status-concluido'
+                    }
+                ">
+
+                    ${
+                        o.status === 'PENDENTE'
+                        ? '🟡 Pendente'
+                        :
+                        o.status === 'EM ANDAMENTO'
+                        ? '🔵 Em andamento'
+                        : '🟢 Concluído'
+                    }
+
+                </span>
+            `
+            :
+            ''
+        }
+
+    </div>
+
+                <p><b>Galpão:</b> ${o.galpao}</p>
+                <p><b>Data:</b> ${o.data}</p>
+                <p><b>SKU:</b> ${o.sku}</p>
+                <p><b>Produto:</b> ${o.descricaoProduto}</p>
+
+                <p>
+                    <b>Preço:</b>
+                    ${Number(o.preco).toLocaleString(
+                        'pt-BR',
+                        {
+                            style:'currency',
+                            currency:'BRL'
+                        }
+                    )}
+                </p>
+
+                    <p>
+                        <b>
+                            ${
+                                o.tipo === "CORTE INDEVIDO"
+                                ? "Quantidade Cortada:"
+                                : "Quantidade:"
+                            }
+                        </b>
+                        ${o.quantidade}
+                    </p>
+
+                    ${
+                        o.tipo === "CORTE INDEVIDO"
+                        ? `
+                            <p>
+                                <b>Quantidade Encontrada:</b>
+                                ${o.quantidadeEncontrada || 0}
+                            </p>
+
+                            <p>
+                                <b>Localização:</b>
+                                ${o.localizacaoCorte || '-'}
+                            </p>
+                        `
+                        : ''
+                    }
+
+                    ${
+                        o.motivoAvaria
+                        ?
+                        `
+                            <p>
+                                <b>Motivo:</b>
+                                ${o.motivoAvaria}
+                            </p>
+                        `
+                        :
+                        ''
+                    }
+
+                    ${
+                        o.tipo === "DESOVADO"
+                        ? `
+                            <p>
+                                <b>Galpão Encontrado:</b>
+                                ${o.galpaoEncontrado || '-'}
+                            </p>
+
+                            <p>
+                                <b>Endereço Encontrado:</b>
+                                ${o.enderecoEncontrado || '-'}
+                            </p>
+
+                            <p>
+                                <b>Tipo Encontrado:</b>
+                                ${o.tipoEncontrado || '-'}
+                            </p>
+
+                            <p>
+                                <b>Galpão Origem:</b>
+                                ${o.galpaoOrigem || '-'}
+                            </p>
+
+                            <p>
+                                <b>Endereço Origem:</b>
+                                ${o.enderecoOrigem || '-'}
+                            </p>
+
+                            <p>
+                                <b>Tipo Origem:</b>
+                                ${o.tipoOrigem || '-'}
+                            </p>
+                        `
+                        : ''
+                    }
+
+                    <p>
+                        <b>Total:</b>
+                    ${total.toLocaleString(
+                        'pt-BR',
+                        {
+                            style:'currency',
+                            currency:'BRL'
+                        }
+                    )}
+                </p>
+
+                <p>
+                    <b>Descrição:</b><br>
+                    ${o.descricao}
+                </p>
+
+
+                ${
+    o.tipo === "AVARIA"
+    ?
+    `
+        <div style="margin-top:18px;">
+
+            <label style="
+                font-size:13px;
+                margin-bottom:6px;
+                display:block;
+            ">
+                Alterar Status
+            </label>
+
+            <select
+                class="status-select"
+                onchange="alterarStatus('${String(o.id)}', this.value)" 
+            >
+
+                <option
+                    value="PENDENTE"
+                    ${o.status === 'PENDENTE' ? 'selected' : ''}
+                >
+                    Pendente
+                </option>
+
+                <option
+                    value="EM ANDAMENTO"
+                    ${o.status === 'EM ANDAMENTO' ? 'selected' : ''}
+                >
+                    Em andamento
+                </option>
+
+                <option
+                    value="CONCLUIDO"
+                    ${o.status === 'CONCLUIDO' ? 'selected' : ''}
+                >
+                    Concluído
+                </option>
+
+            </select>
+
+        </div>
+    `
+    :
+    ''
+}
+
+                <div class="botoes-acao">
+
+                    <button
+                        type="button"
+                        class="btn-edit"
+                    >
+                        <i class="fa-solid fa-pen"></i>
+                        Editar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-delete"
+                    >
+                        <i class="fa-solid fa-trash"></i>
+                        Excluir
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-share"
+                    >
+                        <i class="fa-solid fa-share-nodes"></i>
+                        Compartilhar
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+        /* =========================
+        EVENTOS DOS BOTÕES
+        ========================= */
+
+        div
+        .querySelector(".btn-edit")
+        .addEventListener("click", () => {
+
+            editar(o.id);
+
+        });
+
+        div
+        .querySelector(".btn-delete")
+        .addEventListener("click", () => {
+
+            excluir(o.id);
+
+        });
+
+        div
+        .querySelector(".btn-share")
+        .addEventListener("click", () => {
+
+            compartilharOcorrencia(o.id);
+
+        });
+
+        area.appendChild(div);
+
+    });
+
+    atualizarCards(lista);
+
+}
+
+/* =========================
+CARDS
+========================= */
+
+function atualizarCards(lista){
+
+    let total = 0;
+    let g1 = 0;
+    let g2 = 0;
+    let g4 = 0;
+
+    lista.forEach(o=>{
+
+        const valor =
+        Number(o.preco || 0)
+        *
+        Number(o.quantidade || 0);
+
+        total += valor;
+
+        if(o.galpao === 'G1') g1 += valor;
+        if(o.galpao === 'G2') g2 += valor;
+        if(o.galpao === 'G4') g4 += valor;
+
+    });
+
+    document
+    .getElementById("cardOcorrencias")
+    .innerText =
+    lista.length;
+
+    document
+    .getElementById("cardValor")
+    .innerText =
+    total.toLocaleString(
+        'pt-BR',
+        {
+            style:'currency',
+            currency:'BRL'
+        }
+    );
+
+    document
+    .getElementById("cardG1")
+    .innerText =
+    g1.toLocaleString(
+        'pt-BR',
+        {
+            style:'currency',
+            currency:'BRL'
+        }
+    );
+
+    document
+    .getElementById("cardG2")
+    .innerText =
+    g2.toLocaleString(
+        'pt-BR',
+        {
+            style:'currency',
+            currency:'BRL'
+        }
+    );
+
+    document
+    .getElementById("cardG4")
+    .innerText =
+    g4.toLocaleString(
+        'pt-BR',
+        {
+            style:'currency',
+            currency:'BRL'
+        }
+    );
+
+}
+
+function controlarMotivoAvaria(){
+
+    const tipo =
+    document
+    .getElementById("tipo")
+    .value;
+
+    const box =
+    document
+    .getElementById("boxMotivoAvaria");
+
+    if(tipo === "AVARIA"){
+
+        box.classList.remove("hidden");
+
+    }else{
+
+        box.classList.add("hidden");
+
+        document
+        .getElementById("motivoAvaria")
+        .value = '';
+
+    }
+
+}
+
+/* =========================
+MOSTRAR FILTRO STATUS
+========================= */
+
+function controlarFiltroStatus(){
+
+    const tipo =
+    document.getElementById("filtroTipo").value;
+
+    const statusBox =
+    document.getElementById("filtroStatusBox");
+
+    const motivoBox =
+    document.getElementById("filtroMotivoBox");
+
+    const localizacaoBox =
+    document.getElementById("filtroLocalizacao")
+    ?.parentElement;
+
+    const encontradoBox =
+    document.getElementById("filtroTipoEncontrado")
+    ?.parentElement;
+
+    const origemBox =
+    document.getElementById("filtroTipoOrigem")
+    ?.parentElement;
+
+    /* =========================
+    RESET
+    ========================= */
+
+    statusBox.classList.add("hidden");
+
+    motivoBox.classList.add("hidden");
+
+    if(localizacaoBox){
+        localizacaoBox.classList.add("hidden");
+    }
+
+    if(encontradoBox){
+        encontradoBox.classList.add("hidden");
+    }
+
+    if(origemBox){
+        origemBox.classList.add("hidden");
+    }
+
+    /* =========================
+    AVARIA
+    ========================= */
+
+    if(tipo === "AVARIA"){
+
+        statusBox.classList.remove("hidden");
+
+        motivoBox.classList.remove("hidden");
+
+    }
+
+    /* =========================
+    CORTE INDEVIDO
+    ========================= */
+
+    if(tipo === "CORTE INDEVIDO"){
+
+        if(localizacaoBox){
+            localizacaoBox.classList.remove("hidden");
+        }
+
+    }
+
+    /* =========================
+    DESOVADO
+    ========================= */
+
+    if(tipo === "DESOVADO"){
+
+        if(encontradoBox){
+            encontradoBox.classList.remove("hidden");
+        }
+
+        if(origemBox){
+            origemBox.classList.remove("hidden");
+        }
+
+    }
+
+    /* =========================
+    LIMPA FILTROS
+    ========================= */
+
+    if(tipo !== "AVARIA"){
+
+        document.getElementById("filtroStatus").value = '';
+
+        document.getElementById("filtroMotivoAvaria").value = '';
+
+    }
+
+    if(tipo !== "CORTE INDEVIDO"){
+
+        document.getElementById("filtroLocalizacao").value = '';
+
+    }
+
+    if(tipo !== "DESOVADO"){
+
+        document.getElementById("filtroTipoEncontrado").value = '';
+
+        document.getElementById("filtroTipoOrigem").value = '';
+
+    }
+
+}
+
+/* =========================
+FILTROS
+========================= */
+
+function aplicarFiltros(){
+
+    const filtroEncontrado =
+    document.getElementById("filtroTipoEncontrado").value;
+
+    const filtroOrigem =
+    document.getElementById("filtroTipoOrigem").value;
+
+    const filtroLocalizacao =
+    document.getElementById("filtroLocalizacao").value;
+
+    const inicio =
+    document.getElementById("dataInicio").value;
+
+    const fim =
+    document.getElementById("dataFim").value;
+
+    const galpao =
+    document.getElementById("filtroGalpao").value;
+
+    const tipo =
+    document.getElementById("filtroTipo").value;
+
+    const filtroMotivoAvaria =
+    document.getElementById("filtroMotivoAvaria")?.value || '';
+
+    const status =
+    document.getElementById("filtroStatus")?.value;
+
+    const textoSKU =
+    document
+    .getElementById("pesquisaSKU")
+    .value
+    .toLowerCase()
+    .trim();
+
+    const filtradas =
+    ocorrencias.filter(o=>{
+
+        const filtroData =
+
+        (!inicio || o.data >= inicio)
+        &&
+        (!fim || o.data <= fim);
+
+        const filtroGalpao =
+
+        (!galpao || o.galpao === galpao);
+
+        const filtroTipo =
+
+        (!tipo || o.tipo === tipo);
+
+        const filtroSKU =
+
+        (!textoSKU ||
+        String(o.sku)
+        .toLowerCase()
+        .includes(textoSKU));
+
+        return (
+
+    filtroData
+
+    &&
+
+    filtroGalpao
+
+    &&
+
+    filtroTipo
+
+    &&
+
+    (
+        !status
+        ||
+        o.status === status
+    )
+
+    &&
+
+    (
+        !filtroMotivoAvaria
+        ||
+        o.motivoAvaria === filtroMotivoAvaria
+    )
+
+    &&
+
+    filtroSKU
+
+    &&
+
+    (
+        !filtroEncontrado
+        ||
+        o.tipoEncontrado === filtroEncontrado
+    )
+
+    &&
+
+    (
+        !filtroOrigem
+        ||
+        o.tipoOrigem === filtroOrigem
+    )
+
+    &&
+
+    (
+        !filtroLocalizacao
+        ||
+        o.localizacaoCorte === filtroLocalizacao
+    )
+
+);
+
+    });
+
+    render(filtradas);
+
+}
+
+/* =========================
+PESQUISAR SKU
+========================= */
+
+function pesquisarSKU(){
+
+    aplicarFiltros();
+
+}
+
+/* =========================
+EDITAR
+========================= */
+
+function editar(id){
+
+    console.log("EDITANDO ID:", id);
+
+    const o = ocorrencias.find(
+        item => String(item.id) === String(id)
+    );
+
+    if(!o){
+
+        alert("Ocorrência não encontrada.");
+        return;
+
+    }
+
+    editandoId = o.id;
+
+    /* =========================
+    CAMPOS PRINCIPAIS
+    ========================= */
+
+    document.getElementById("tipo").value =
+    o.tipo || '';
+
+    /* MOSTRA CAMPOS DINÂMICOS */
+
+    controlarMotivoAvaria();
+
+    toggleCampos();
+
+    /* MOTIVO AVARIA */
+
+    const motivoAvaria =
+    document.getElementById("motivoAvaria");
+
+    if(motivoAvaria){
+
+        motivoAvaria.value =
+        o.motivoAvaria || '';
+
+    }
+
+    setTimeout(() => {
+
+        /* =========================
+        PRINCIPAIS
+        ========================= */
+
+        document.getElementById("galpao").value =
+        o.galpao || '';
+
+        document.getElementById("data").value =
+        o.data || '';
+
+        document.getElementById("sku").value =
+        o.sku || '';
+
+        document.getElementById("descricaoProduto").value =
+        o.descricaoProduto || '';
+
+        document.getElementById("precoProduto").value =
+        Number(o.preco || 0)
+        .toLocaleString(
+            'pt-BR',
+            {
+                minimumFractionDigits:2,
+                maximumFractionDigits:2
+            }
+        );
+
+        document.getElementById("quantidade").value =
+        o.quantidade || '';
+
+        document.getElementById("descricao").value =
+        o.descricao || '';
+
+        /* =========================
+        CORTE INDEVIDO
+        ========================= */
+
+        const quantidadeEncontrada =
+        document.getElementById("quantidadeEncontrada");
+
+        const localizacaoCorte =
+        document.getElementById("localizacaoCorte");
+
+        if(quantidadeEncontrada){
+
+            quantidadeEncontrada.value =
+            o.quantidadeEncontrada || '';
+
+        }
+
+        if(localizacaoCorte){
+
+            localizacaoCorte.value =
+            o.localizacaoCorte || '';
+
+        }
+
+        /* =========================
+        DESOVADO
+        ========================= */
+
+        const galpaoEncontrado =
+        document.getElementById("galpaoEncontrado");
+
+        const enderecoEncontrado =
+        document.getElementById("enderecoEncontrado");
+
+        const tipoEncontrado =
+        document.getElementById("tipoEncontrado");
+
+        const galpaoOrigem =
+        document.getElementById("galpaoOrigem");
+
+        const enderecoOrigem =
+        document.getElementById("enderecoOrigem");
+
+        const tipoOrigem =
+        document.getElementById("tipoOrigem");
+
+        if(galpaoEncontrado){
+
+            galpaoEncontrado.value =
+            o.galpaoEncontrado || '';
+
+        }
+
+        if(enderecoEncontrado){
+
+            enderecoEncontrado.value =
+            o.enderecoEncontrado || '';
+
+        }
+
+        if(tipoEncontrado){
+
+            tipoEncontrado.value =
+            o.tipoEncontrado || '';
+
+        }
+
+        if(galpaoOrigem){
+
+            galpaoOrigem.value =
+            o.galpaoOrigem || '';
+
+        }
+
+        if(enderecoOrigem){
+
+            enderecoOrigem.value =
+            o.enderecoOrigem || '';
+
+        }
+
+        if(tipoOrigem){
+
+            tipoOrigem.value =
+            o.tipoOrigem || '';
+
+        }
+
+    }, 50);
+
+    /* =========================
+    SCROLL TO TOP
+    ========================= */
+
+    window.scrollTo({
+
+        top:0,
+        behavior:'smooth'
+
+    });
+
+}
+
+/* =========================
+COMPARTILHAR
+========================= */
+
+function compartilharOcorrencia(id){
+
+    const o =
+    ocorrencias.find(item =>
+        String(item.id) === String(id)
+    );
+
+    if(!o){
+
+        alert("Ocorrência não encontrada.");
+        return;
+
+    }
+
+    const total =
+    Number(o.preco || 0)
+    *
+    Number(o.quantidade || 0);
+
+    const email =
+    prompt("Digite o e-mail de destino:");
+
+    if(!email){
+
+        return;
+
+    }
+
+    const assunto =
+    `Ocorrência - ${o.tipo} - SKU ${o.sku}`;
+
+    const mensagem = `
+
+Tipo: ${o.tipo}
+
+Galpão: ${o.galpao}
+
+Data: ${o.data}
+
+SKU: ${o.sku}
+
+Produto: ${o.descricaoProduto}
+
+Quantidade: ${o.quantidade}
+
+Valor Total: ${total.toLocaleString(
+    'pt-BR',
+    {
+        style:'currency',
+        currency:'BRL'
+    }
+)}
+
+Descrição:
+${o.descricao}
+
+`;
+
+    const mailto =
+
+    `mailto:${email}` +
+
+    `?subject=${encodeURIComponent(assunto)}` +
+
+    `&body=${encodeURIComponent(mensagem)}`;
+
+    window.location.href = mailto;
+
+}
+
+/* =========================
+EXCLUIR
+========================= */
+
+function excluir(id){
+
+    const confirmar =
+    confirm(
+        "Deseja excluir esta ocorrência?"
+    );
+
+    if(!confirmar){
+
+        return;
+
+    }
+
+    ocorrencias =
+    ocorrencias.filter(
+        item => String(item.id) !== String(id)
+    );
+
+    localStorage.setItem(
+        "ocorrencias",
+        JSON.stringify(ocorrencias)
+    );
+
+    render();
+
+}
+
+/* =========================
+LIMPAR
+========================= */
+
+function limparFormulario(){
+
+    document.getElementById("tipo").value = '';
+    document.getElementById("galpao").value = '';
+    document.getElementById("data").value = '';
+    document.getElementById("sku").value = '';
+    document.getElementById("descricaoProduto").value = '';
+    document.getElementById("precoProduto").value = '';
+    document.getElementById("quantidade").value = '';
+    document.getElementById("descricao").value = '';
+    document.getElementById("imagem").value = '';
+
+    const galpaoEncontrado =
+    document.getElementById("galpaoEncontrado");
+
+    if(galpaoEncontrado){
+
+        galpaoEncontrado.value = '';
+
+    }
+    document.getElementById("enderecoEncontrado").value = '';
+    document.getElementById("tipoEncontrado").value = '';
+    document.getElementById("galpaoOrigem").value = '';
+    document.getElementById("enderecoOrigem").value = '';
+    document.getElementById("tipoOrigem").value = '';
+
+    document
+    .getElementById("camposDesovado")
+    .classList.add("hidden");
+
+    document.getElementById("quantidadeEncontrada").value = '';
+
+    document.getElementById("localizacaoCorte").value = '';
+
+    document
+    .getElementById("camposCorte")
+    .classList.add("hidden");
+
+    editandoId = null;
+
+}
+
+/* =========================
+EXPORTAR CSV
+========================= */
+function exportarCSV(){
+
+    let csv =
+"Tipo;Galpão;Data;SKU;Produto;Preço;Quantidade;Quantidade Encontrada;Localização;Galpão Encontrado;Endereço Encontrado;Tipo Encontrado;Galpão Origem;Endereço Origem;Tipo Origem;Total;Descrição\n";
+
+    ocorrencias.forEach(o => {
+
+        const total =
+        Number(o.preco || 0) *
+        Number(o.quantidade || 0);
+
+        csv +=
+
+            `"${o.tipo || ''}";` +
+            `"${o.galpao || ''}";` +
+            `"${o.data || ''}";` +
+            `"${o.sku || ''}";` +
+            `"${o.descricaoProduto || ''}";` +
+            `"${Number(o.preco || 0).toFixed(2)}";` +
+            `"${o.quantidade || 0}";` +
+            `"${o.quantidadeEncontrada || ''}";` +
+            `"${o.localizacaoCorte || ''}";` +
+            `"${o.galpaoEncontrado || ''}";` +
+            `"${o.enderecoEncontrado || ''}";` +
+            `"${o.tipoEncontrado || ''}";` +
+            `"${o.galpaoOrigem || ''}";` +
+            `"${o.enderecoOrigem || ''}";` +
+            `"${o.tipoOrigem || ''}";` +
+            `"${total.toFixed(2)}";` +
+            `"${String(o.descricao || '').replace(/"/g,'""')}"\n`;
+        });
+
+    const blob = new Blob(
+        ["\uFEFF" + csv],
+        {
+            type:'text/csv;charset=utf-8;'
+        }
+    );
+
+    const link =
+    document.createElement("a");
+
+    link.href =
+    URL.createObjectURL(blob);
+
+    link.download =
+    "ocorrencias.csv";
+
+    link.click();
+
+}
+
+/* =========================
+EXPORTAR PDF
+========================= */
+
+function exportarPDF(){
+
+    window.print();
+
+}
+
+/* =========================
+ENTER NO LOGIN
+========================= */
+
+document
+.getElementById("usuario")
+.addEventListener("keypress", function(e){
+
+    if(e.key === "Enter"){
+
+        login();
+
+    }
+
+});
+
+document
+.getElementById("senha")
+.addEventListener("keypress", function(e){
+
+    if(e.key === "Enter"){
+
+        login();
+
+    }
+
+});
+
+
+/* =========================
+ALTERAR STATUS
+========================= */
+
+function alterarStatus(id, novoStatus){
+
+    const ocorrencia = ocorrencias.find(
+        o => String(o.id) === String(id)
+    );
+
+    if(!ocorrencia){
+        return;
+    }
+
+    /* atualiza status */
+    ocorrencia.status = novoStatus;
+
+    /* salva */
+    localStorage.setItem(
+        "ocorrencias",
+        JSON.stringify(ocorrencias)
+    );
+
+    /* atualiza tela mantendo filtros */
+    aplicarFiltros();
+
+}
+
+/* =========================
+INICIAR
+========================= */
+
+render();
+testarSupabase();
+document.getElementById("appArea").style.display = "none";
+</script>
+
+</body>
+</html>
